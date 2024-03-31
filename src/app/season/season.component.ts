@@ -5,6 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 import {Division} from "../shared/data/division";
 import {map, switchMap} from "rxjs";
 import {DivisionService} from "../shared/division.service";
+import {DivisionDrawerService} from "../shared/division-drawer.service";
 
 @Component({
   selector: 'bmm-season',
@@ -15,10 +16,12 @@ export class SeasonComponent implements OnChanges {
   season: Season | undefined;
   divisions: Division[] = [];
   division: Division | undefined;
+  divisionDrawerOpened = false;
 
   constructor(private seasonService: SeasonService,
               private divisionService: DivisionService,
-              private route: ActivatedRoute) {
+              private route: ActivatedRoute,
+              private divisionDrawerService: DivisionDrawerService) {
     this.setupData();
   }
 
@@ -27,6 +30,7 @@ export class SeasonComponent implements OnChanges {
   }
 
   setupData() {
+    this.divisionDrawerOpened = this.divisionDrawerService.isOpen();
     this.route.paramMap.pipe(map(params => params.get('seasonName')!),
       switchMap(sName => this.seasonService.getSeasonByName(sName)))
       .subscribe(s => {
@@ -44,5 +48,15 @@ export class SeasonComponent implements OnChanges {
 
   setDivision(division: Division) {
     this.division = division;
+  }
+
+  openDrawer() {
+    this.divisionDrawerService.openDrawer();
+    this.divisionDrawerOpened = true;
+  }
+
+  closeDrawer() {
+    this.divisionDrawerService.closeDrawer();
+    this.divisionDrawerOpened = false;
   }
 }
